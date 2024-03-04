@@ -1,0 +1,25 @@
+---
+- name: Power on VM
+  hosts: "{{ esxi_host }}"
+  gather_facts: no
+  tasks:
+    - name: Power on the VM
+      shell: >
+        nohup sh /vmfs/volumes/datastore1/scripts/power_on_vm.sh {{ vm_name }}
+      delegate_to: "{{ inventory_hostname }}"
+      args:
+        executable: /bin/sh
+      poll: 0
+
+    - name: Wait for VM to present question (optional)
+      pause:
+        seconds: 10  # Adjust the wait time as necessary
+
+    - name: Answer VM question
+      shell: >
+        vim-cmd vmsvc/message `vim-cmd vmsvc/getallvms | grep "{{ vm_name }}" | awk '{print \$1}'` 
+      delegate_to: "{{ inventory_hostname }}"
+      args:
+        executable: /bin/sh
+      ignore_errors: yes  # Optional, in case there is no pending question
+

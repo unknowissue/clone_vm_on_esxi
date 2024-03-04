@@ -1,0 +1,13 @@
+---
+- name: Power off VM
+  hosts: "{{ esxi_host }}"
+  gather_facts: no
+  tasks:
+    - name: Power off the VM
+      shell: >
+        nohup sh /vmfs/volumes/datastore1/scripts/power_off_vm.sh {{ vm_name }} 
+      tags: 
+        - Power_off_VM
+      delegate_to: "{{ inventory_hostname }}"
+      args:
+        executable: /bin/sh
