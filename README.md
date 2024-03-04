@@ -1,6 +1,10 @@
 # clone_vm_on_esxi
+<br>
 在esxi上直接克隆虚拟机，并修改新虚拟机IP地址
-
+<br>
+配置
+<br>
+```shell
 1、用户能够用 证书 登陆esxi主机
 2、修改clone_vm.py 文件
 #模板名称 ，模板需要关机
@@ -17,3 +21,4 @@ template_ip = "192.168.3.54"  # Template VM's IP address
 #新虚拟机的IP和主机名
 new_ips = ["192.168.3.101", "192.168.3.102", "192.168.3.103"]
 new_hostnames = ["new-host-01", "new-host-02", "new-host-03"]
+```
