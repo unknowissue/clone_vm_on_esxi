@@ -5,7 +5,7 @@
   tasks:
     - name: Power on the VM
       shell: >
-        nohup sh /vmfs/volumes/datastore1/scripts/power_on_vm.sh {{ vm_name }}
+        nohup sh /vmfs/volumes/datastore1/scripts/power_on_vm.sh {{ vm_name }}  >> /vmfs/volumes/datastore1/scripts/power_on_vm.log
       delegate_to: "{{ inventory_hostname }}"
       args:
         executable: /bin/sh

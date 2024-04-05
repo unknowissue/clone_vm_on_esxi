@@ -1,0 +1,16 @@
+---
+- name: Power off VM
+  hosts: "{{ esxi_host }}"
+  gather_facts: no
+  tasks:
+    - name: Power off the VM
+      shell: >
+        sh /vmfs/volumes/datastore1/scripts/power_status.sh {{ vm_name }} 
+      register: shell_result
+      tags: 
+        - Power_status
+      delegate_to: "{{ inventory_hostname }}"
+      args:
+        executable: /bin/sh
+    -  debug:
+        var: shell_result.stdout_lines

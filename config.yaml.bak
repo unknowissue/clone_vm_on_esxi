@@ -1,0 +1,19 @@
+vm_names:
+  - cluster04-db01
+  - cluster04-db02
+template_name: rac_template1
+esxi_host: esxi-host
+template_vmx: rac_template1.vmx
+template_vmdks:
+  - rac_template1_1.vmdk
+  - rac_template1_2.vmdk
+base_destination_path: /vmfs/volumes/datastore2_sas1
+template_ip: 192.168.3.52
+new_ips:
+  - 192.168.3.115
+  - 192.168.3.116
+new_hostnames:
+  - cluster04-db01
+  - cluster04-db02
+ens_name:
+  - ens192

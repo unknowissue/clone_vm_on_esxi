@@ -1,0 +1,34 @@
+---
+- name: Clone_and_setup_VM
+  hosts: "{{ esxi_host }}"
+  gather_facts: no
+  tasks:
+
+    - name: Copy VMX file to destination
+      shell: >
+        cp "{{ template_vmx_path }}"
+        "{{ vm_path }}/{{ vm_name }}.vmx"
+      tags: 
+        - Clone_and_setup_VM
+      delegate_to: "{{ inventory_hostname }}"
+      args:
+        executable: /bin/sh
+
+    - name: Update VMX file for the cloned VM
+      replace:
+        path: "{{ vm_path }}/{{ vm_name }}.vmx"
+        regexp: '{{ template_name }}'
+        replace: "{{ vm_name }}"
+      tags: 
+        - Clone_and_setup_VM
+      delegate_to: "{{ inventory_hostname }}"
+
+    - name: Register the cloned VM
+      shell: >
+        vim-cmd solo/registervm "{{ vm_path }}/{{ vm_name }}.vmx"
+      tags: 
+        - Clone_and_setup_VM
+      delegate_to: "{{ inventory_hostname }}"
+      args:
+        executable: /bin/sh
+

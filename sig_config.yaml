@@ -1,0 +1,13 @@
+vm_names:
+- vm_name: sig-test2
+  new_ips:
+      - network: ens34
+        ip : 192.168.3.117
+        
+esxi_host: esxi-host
+template_name: template2
+template_vmx: template2.vmx
+template_vmdks:
+  - template2.vmdk
+base_destination_path: /vmfs/volumes/datastore2_sas1
+template_ip: 192.168.3.54
