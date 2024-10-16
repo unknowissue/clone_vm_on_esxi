@@ -1,0 +1,41 @@
+vm_names:
+- vm_name: ob01-db01
+  new_ips:
+      - network: ens192
+        ip : 192.168.3.124
+      - network: ens224
+        ip : 100.100.100.124
+- vm_name: ob01-db02
+  new_ips:
+      - network: ens192
+        ip : 192.168.3.125
+      - network: ens224
+        ip : 100.100.100.125
+- vm_name: ob01-db03
+  new_ips:
+      - network: ens192
+        ip : 192.168.3.126
+      - network: ens224
+        ip : 100.100.100.126
+- vm_name: ob01-pr01
+  new_ips:
+      - network: ens192
+        ip : 192.168.3.127
+      - network: ens224
+        ip : 100.100.100.127
+- vm_name: ob01-pr02
+  new_ips:
+      - network: ens192
+        ip : 192.168.3.128
+      - network: ens224
+        ip : 100.100.100.128
+        
+esxi_host: esxi-host
+template_name: rac_template1
+template_vmx: rac_template1.vmx
+template_vmdks:
+  - rac_template1_1.vmdk
+  - rac_template1_2.vmdk
+
+base_destination_path: /vmfs/volumes/datastore3_sas2
+template_ip: 192.168.3.52

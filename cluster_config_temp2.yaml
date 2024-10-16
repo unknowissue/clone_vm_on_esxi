@@ -1,0 +1,42 @@
+vm_names:
+- vm_name: cluster05-db01
+  new_ips:
+      - network: ens34
+        ip : 192.168.3.124
+      - network: ens37
+        ip : 100.100.100.124
+- vm_name: cluster05-db02
+  new_ips:
+      - network: ens34
+        ip : 192.168.3.125
+      - network: ens37
+        ip : 100.100.100.125
+- vm_name: cluster05-db03
+  new_ips:
+      - network: ens34
+        ip : 192.168.3.126
+      - network: ens37
+        ip : 100.100.100.126
+- vm_name: cluster05-db04
+  new_ips:
+      - network: ens34
+        ip : 192.168.3.127
+      - network: ens37
+        ip : 100.100.100.127
+- vm_name: cluster05-db05
+  new_ips:
+      - network: ens34
+        ip : 192.168.3.128
+      - network: ens37
+        ip : 100.100.100.128
+        
+esxi_host: esxi-host
+template_name: rac_template2
+template_vmx: rac_template2.vmx
+template_vmdks:
+  - rac_template2.vmdk
+  - rac_template2_1.vmdk
+  - rac_template2_2.vmdk
+
+base_destination_path: /vmfs/volumes/datastore3_sas2
+template_ip: 192.168.3.54

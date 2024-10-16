@@ -1,0 +1,23 @@
+---
+- name: Clone_vm_disk
+  hosts: "{{ esxi_host }}"
+  gather_facts: no
+  tasks:
+    - name: Create destination directory for the cloned VM
+      file:
+        path: "{{ vm_path }}"
+        state: directory
+      tags: 
+        - Clone_and_setup_VM
+      delegate_to: "{{ inventory_hostname }}"
+    - name: Clone VM disk from template
+      shell: | 
+        cp  "{{ template_vmdk_path }}" "{{ vm_path }}"
+        cd  "{{ vm_path }}" 
+        vmkfstools -E "{{ template_vmdk }}" "{{ vmdk_filename }}"
+        mv  "{{ template_vmdk }}" "{{ vmdk_filename }}"
+      tags: 
+        - Clone_and_setup_VM
+      delegate_to: "{{ inventory_hostname }}"
+      args:
+        executable: /bin/sh

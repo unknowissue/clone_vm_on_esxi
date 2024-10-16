@@ -4,7 +4,6 @@ import os
 import yaml
 import json
 import argparse
-import logging
 from jsonsearch import JsonSearch
 
 def run_ansible_command(command):
@@ -28,67 +27,29 @@ def clone_vm_from_template(vm_name, template_name, esxi_host, template_vmx, temp
     playbook_command = f"ansible-playbook update_vmx_register.yml -e 'vm_name={vm_name} template_name={template_name} esxi_host={esxi_host} template_vmx_path={template_vmx_path}  vm_path={vm_path}' -vvvv"
     run_ansible_command(playbook_command)    
 
-# 配置日志记录
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-def wait_for_ssh_and_change_ip_hostname(vm_name, template_ip, vm_config, max_retries=10, sleep_interval=60):
+def wait_for_ssh_and_change_ip_hostname(vm_name, template_ip,  vm_config , max_retries=10, sleep_interval=60):
     """Wait for SSH to be available on the cloned VM and change its IP and hostname."""
-    
-    modify_hostname_command = f"sshpass -p 'oracle' ssh -o StrictHostKeyChecking=no root@{template_ip} 'hostnamectl set-hostname {vm_name}'"
+    modify_hostname_command = f"sshpass -p 'oracle' ssh -o StrictHostKeyChecking=no root@{template_ip} 'hostnamectl set-hostname {vm_name} '"
     check_hostname_command = f"sshpass -p 'oracle' ssh -o StrictHostKeyChecking=no root@{template_ip} 'hostname | grep {vm_name} | wc -l'"
     shutdown_command = f"sshpass -p 'oracle' ssh -o StrictHostKeyChecking=no root@{template_ip} 'nohup sh /root/scripts/shut.sh &'"
-    
+    check_ip_value = 0
     for attempt in range(max_retries):
         try:
-            logging.info(f"Attempt {attempt + 1}: Starting IP and hostname configuration for VM: {vm_name}")
-            check_ip_value = 0  # 重置 IP 检查计数器
-
-            for new_ip in vm_config['new_ips']:
-                modify_ip_command = f"sshpass -p 'oracle' ssh -o StrictHostKeyChecking=no root@{template_ip} 'sh /root/scripts/set_net.sh {new_ip['network']} {new_ip['ip']}'"
-                logging.info(f"Executing IP modification command: {modify_ip_command}")
-                
-                result = run_ansible_command(modify_ip_command)
-                logging.info(f"IP modification command output: {result.stdout.decode().strip()}")
-                
-                check_ip_command = f"sshpass -p 'oracle' ssh -o StrictHostKeyChecking=no root@{template_ip} 'sh /root/scripts/get_net.sh {new_ip['network']} {new_ip['ip']}'"
-                logging.info(f"Executing IP check command: {check_ip_command}")
-                
-                check_result = run_ansible_command(check_ip_command)
-                check_ip_value += int(check_result.stdout.decode().strip())
-                logging.info(f"IP check command output: {check_result.stdout.decode().strip()}")
-
-            logging.info(f"Total IP checks passed: {check_ip_value}/{len(vm_config['new_ips'])}")
-
-            # 修改主机名
-            logging.info(f"Executing hostname modification command: {modify_hostname_command}")
+            for new_ip in  vm_config['new_ips'] :
+                modify_ip_command = f"sshpass -p 'oracle' ssh -o StrictHostKeyChecking=no root@{template_ip} 'sh /root/scripts/set_net.sh  {new_ip['network']}  {new_ip['ip']} '"
+                run_ansible_command(modify_ip_command)
+                check_ip_command = f"sshpass -p 'oracle' ssh -o StrictHostKeyChecking=no root@{template_ip} 'sh /root/scripts/get_net.sh  {new_ip['network']}  {new_ip['ip']} '"
+                check_ip_value = check_ip_value + int(run_ansible_command(check_ip_command).stdout.decode().strip())
             run_ansible_command(modify_hostname_command)
-            check_hostname_result = run_ansible_command(check_hostname_command)
-            check_hostname_value = int(check_hostname_result.stdout.decode().strip())
-            logging.info(f"Hostname check result: {check_hostname_value}")
-
-            if check_ip_value == len(vm_config['new_ips']) and check_hostname_value == 1:
-                logging.info(f"IP and hostname for {vm_name} changed successfully.")
-                
-                # 执行关机命令
-                logging.info(f"Executing shutdown command: {shutdown_command}")
+            check_hostname_value = int(run_ansible_command(check_hostname_command).stdout.decode().strip())
+            if check_ip_value ==  len( vm_config['new_ips'] )  and check_hostname_value ==  1 :
+                print(f"IP and hostname for {vm_name} changed successfully.")
                 run_ansible_command(shutdown_command)
                 break
 
-        except subprocess.CalledProcessError as e:
-            logging.error(f"Attempt {attempt + 1} failed with error: {e}. Output: {e.output.decode().strip()}, Stderr: {e.stderr.decode().strip() if e.stderr else 'None'}")
-            if attempt + 1 < max_retries:
-                logging.info(f"Retrying in {sleep_interval} seconds...")
-                time.sleep(sleep_interval)
-            else:
-                logging.error(f"Max retries reached for VM: {vm_name}. Exiting with failure.")
-        except Exception as e:
-            logging.exception(f"An unexpected error occurred on attempt {attempt + 1}: {e}")
-            if attempt + 1 < max_retries:
-                logging.info(f"Retrying in {sleep_interval} seconds...")
-                time.sleep(sleep_interval)
-            else:
-                logging.error(f"Max retries reached for VM: {vm_name}. Exiting with failure.")
-
+        except subprocess.CalledProcessError:
+            print(f"Attempt {attempt + 1} failed, retrying in {sleep_interval} seconds...")
+            time.sleep(sleep_interval)
 
 def power_on_vm(vm_name, esxi_host):
     """Power on a specified VM on a given ESXi host."""
