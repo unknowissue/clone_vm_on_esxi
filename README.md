@@ -1,17 +1,11 @@
-# clone_vm_on_esxi
-<br>
-在esxi上直接克隆虚拟机，并修改新虚拟机IP地址
-<br>
-配置
-<br>
+# clone_vm_on_esxi   
 
+在esxi上直接克隆虚拟机，并修改新虚拟机IP地址   
 
-1、用户能够用 证书 登陆esxi主机
-2、修改 clone.py 文件 为 自己的定义文件
-```
-    config = load_config('sig_config.yaml')
-```
+必要条件   
 
+**用户能够用 证书 登陆esxi主机**
+## 修改配置 
 配置模板-单机 ( sig_config.yaml )
 ```
 - vm_name: sig-test2
@@ -53,17 +47,17 @@ template_vmdks:
 base_destination_path: /vmfs/volumes/datastore2_sas1
 template_ip: 192.168.3.52
 ```
-解释
+解释说明
 ```
 vm_name 主机名、虚拟机名称
-new_ips 网卡名称和IP地址
+new_ips 网卡名称和IP地址，可以有多网卡
 esxi_host esxi主机
 template_name 模板名称
 template_vmx 模板vmx文件
-template_vmdks 模板vmdk列表
+template_vmdks 模板vmdk列表，可以有多个文件
 base_destination_path 基础目录，模板和新虚拟机需要在这个目录下
 ```
-3、开始克隆
+## 开始克隆
 ```
 python clone.py cluster_config_temp1.yaml
 ```
