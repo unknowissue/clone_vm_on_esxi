@@ -63,3 +63,7 @@ template_vmx 模板vmx文件
 template_vmdks 模板vmdk列表
 base_destination_path 基础目录，模板和新虚拟机需要在这个目录下
 ```
+3、开始克隆
+```
+python clone.py cluster_config_temp1.yaml
+```
